@@ -1,0 +1,15 @@
+-[ RECORD 1 ]-------
+last_value | 2000000
+is_called  | t
+
+-[ RECORD 1 ]------
+last_value | 400000
+is_called  | f
+
+-[ RECORD 1 ]-------
+last_value | 5000000
+is_called  | t
+
+-[ RECORD 1 ]-------------------------------------------------------------------------------------------------------------------------------
+sequences | partitioned_identity.list_by_default_id_seq, partitioned_identity.nested_always_id_seq, partitioned_identity.range_always_id_seq
+
