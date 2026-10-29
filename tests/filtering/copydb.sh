@@ -59,6 +59,7 @@ mkdir -p /tmp/results
 
 find .
 
+FAILED=0
 pgopts="--single-transaction --no-psqlrc --expanded"
 
 for f in ./exclude/sql/*.sql
@@ -69,7 +70,7 @@ do
     psql -d "${PGCOPYDB_TARGET_PGURI}" ${pgopts} --file ./exclude/sql/$t.sql &> $r
     test -f $e || cat $r
     diff -urN $e $r || cat $e $r
-    diff -urN $e $r || exit 1
+    diff -urN $e $r || FAILED=1
 done
 
 # list the tables that are (not) selected by the filters
@@ -91,5 +92,7 @@ do
     psql -d "${PGCOPYDB_TARGET_PGURI}" ${pgopts} --file ./include/sql/$t.sql &> $r
     test -f $e || cat $r
     diff $e $r || cat $r
-    diff $e $r || exit 1
+    diff $e $r || FAILED=1
 done
+
+test $FAILED = 0
