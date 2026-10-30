@@ -90,6 +90,11 @@ done
 sqlite3 -header /tmp/pgcopydb/schema/filter.db "select * from filter where restore_list_name like '%partitioned_identity%' or oid in (select oid from s_seq where relname like 'partitioned_identity%')" 2>&1
 echo "=== target sequences"
 psql -At -d ${PAGILA_TARGET_PGURI} -c "select schemaname, sequencename from pg_sequences where sequencename like 'partitioned_identity%'"
+echo "=== target pg_inherits / depend"
+psql -At -d ${PAGILA_TARGET_PGURI} -c "select inhparent::regclass, inhrelid::regclass from pg_inherits where inhrelid::regclass::text like '%partitioned_identity%'"
+psql -At -d ${PAGILA_TARGET_PGURI} -c "select classid::regclass, objid::regclass, refobjid::regclass, deptype from pg_depend where objid = 'public.partitioned_identity_id_seq'::regclass"
+echo "=== source pg_inherits"
+psql -At -d ${PAGILA_SOURCE_PGURI} -c "select inhparent::regclass, inhrelid::regclass from pg_inherits where inhrelid::regclass::text like '%partitioned_identity%'"
 set -e
 
 pgcopydb compare schema \
