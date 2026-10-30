@@ -76,6 +76,22 @@ pgcopydb clone --notice \
          --source ${PAGILA_SOURCE_PGURI} \
          --target ${PAGILA_TARGET_PGURI}
 
+# DEBUG (do not merge): show how the sequence travels through the restore lists
+set +e
+ls -la /tmp/pgcopydb/schema/
+echo "=== grep partitioned_identity in the TOC and restore lists"
+for f in /tmp/pgcopydb/schema/*.list; do echo "--- $f"; grep -n 'partitioned_identity' $f; done
+pg_restore -l /tmp/pgcopydb/schema/schema.dump | grep -n 'partitioned_identity'
+echo "=== s_seq and filter rows"
+for db in source filter; do
+  echo "--- $db.db"
+  sqlite3 -header /tmp/pgcopydb/schema/$db.db "select * from s_seq where relname like 'partitioned_identity%'" 2>&1
+done
+sqlite3 -header /tmp/pgcopydb/schema/filter.db "select * from filter where restore_list_name like '%partitioned_identity%' or oid in (select oid from s_seq where relname like 'partitioned_identity%')" 2>&1
+echo "=== target sequences"
+psql -At -d ${PAGILA_TARGET_PGURI} -c "select schemaname, sequencename from pg_sequences where sequencename like 'partitioned_identity%'"
+set -e
+
 pgcopydb compare schema \
          --source ${PAGILA_SOURCE_PGURI} \
          --target ${PAGILA_TARGET_PGURI}
