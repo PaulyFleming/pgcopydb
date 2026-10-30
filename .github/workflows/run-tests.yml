@@ -115,6 +115,7 @@ jobs:
         TEST:
           - pagila
           - pagila-multi-steps
+          - toc-coverage
           - pagila-standby
           - unit
           - blobs
