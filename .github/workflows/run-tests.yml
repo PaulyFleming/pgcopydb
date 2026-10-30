@@ -232,7 +232,7 @@ jobs:
         if: matrix.TEST == 'toc-coverage'
         run: |
           docker run --rm -v "$PWD/tests/toc-coverage:/toc" \
-            -e PGCOPYDB=/usr/src/pgcopydb/src/bin/pgcopydb/pgcopydb \
+            -e PGCOPYDB=/usr/local/bin/pgcopydb \
             pgcopydb bash /toc/check.sh
 
   style_checker:
